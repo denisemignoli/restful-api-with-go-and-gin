@@ -4,33 +4,37 @@ import (
 	"net/http"
 
 	"github.com/denisemignoli/restful-api-with-go-and-gin/models"
+	"github.com/denisemignoli/restful-api-with-go-and-gin/repositories"
 
 	"github.com/gin-gonic/gin"
 )
 
 func GetAlbums(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, models.Albums)
+	albumRepository := &repositories.AlbumRepository{}
+	albums := albumRepository.GetAlbums()
+	c.IndentedJSON(http.StatusOK, albums)
 }
 
 func PostAlbums(c *gin.Context) {
+	albumRepository := &repositories.AlbumRepository{}
+
 	var newAlbum models.Album
-
 	if err := c.BindJSON(&newAlbum); err != nil {
-		return
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Invalid JSON format"})
 	}
-
-	models.Albums = append(models.Albums, newAlbum)
+	albumRepository.PostAlbums(newAlbum)
 	c.IndentedJSON(http.StatusCreated, newAlbum)
 }
 
 func GetAlbumByID(c *gin.Context) {
 	id := c.Param("id")
+	albumRepository := &repositories.AlbumRepository{}
 
-	for _, a := range models.Albums {
-		if a.ID == id {
-			c.IndentedJSON(http.StatusOK, a)
-			return
-		}
+	album, err := albumRepository.GetAlbumByID(id)
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "album not found"})
+		return
 	}
-	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "album not found"})
+
+	c.IndentedJSON(http.StatusOK, album)
 }

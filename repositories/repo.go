@@ -18,7 +18,7 @@ func (a *AlbumRepository) GetAlbums() []models.Album {
 	return albums
 }
 
-func (a *AlbumRepository) PostAlbums(newAlbum models.Album) {
+func (a *AlbumRepository) SaveAlbums(newAlbum models.Album) {
 	albums = append(albums, newAlbum)
 }
 

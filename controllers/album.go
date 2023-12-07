@@ -9,28 +9,34 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetAlbums(c *gin.Context) {
-	albumRepository := &repositories.AlbumRepository{}
-	albums := albumRepository.GetAlbums()
+type AlbumController struct {
+	AlbumRepository *repositories.AlbumRepository
+}
+
+func NewAlbumController() *AlbumController {
+	return &AlbumController{
+		AlbumRepository: &repositories.AlbumRepository{},
+	}
+}
+
+func (ac *AlbumController) GetAlbums(c *gin.Context) {
+	albums := ac.AlbumRepository.GetAlbums()
 	c.IndentedJSON(http.StatusOK, albums)
 }
 
-func PostAlbums(c *gin.Context) {
-	albumRepository := &repositories.AlbumRepository{}
-
+func (ac *AlbumController) PostAlbums(c *gin.Context) {
 	var newAlbum models.Album
 	if err := c.BindJSON(&newAlbum); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Invalid JSON format"})
 	}
-	albumRepository.PostAlbums(newAlbum)
+	ac.AlbumRepository.SaveAlbums(newAlbum)
 	c.IndentedJSON(http.StatusCreated, newAlbum)
 }
 
-func GetAlbumByID(c *gin.Context) {
+func (ac *AlbumController) GetAlbumByID(c *gin.Context) {
 	id := c.Param("id")
-	albumRepository := &repositories.AlbumRepository{}
 
-	album, err := albumRepository.GetAlbumByID(id)
+	album, err := ac.AlbumRepository.GetAlbumByID(id)
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "album not found"})
 		return

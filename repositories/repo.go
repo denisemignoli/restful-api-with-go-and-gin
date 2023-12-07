@@ -14,6 +14,10 @@ var albums = []models.Album{
 
 type AlbumRepository struct{}
 
+func NewAlbumRepository() *AlbumRepository {
+	return &AlbumRepository{}
+}
+
 func (a *AlbumRepository) GetAlbums() []models.Album {
 	return albums
 }

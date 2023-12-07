@@ -13,9 +13,15 @@ type AlbumController struct {
 	AlbumRepository *repositories.AlbumRepository
 }
 
+// func NewAlbumController() *AlbumController {
+// 	return &AlbumController{
+// 		AlbumRepository: &repositories.AlbumRepository{},
+// 	}
+// }
+
 func NewAlbumController() *AlbumController {
 	return &AlbumController{
-		AlbumRepository: &repositories.AlbumRepository{},
+		AlbumRepository: repositories.NewAlbumRepository(),
 	}
 }
 

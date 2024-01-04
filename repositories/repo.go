@@ -14,11 +14,15 @@ var albums = []models.Album{
 
 type AlbumRepository struct{}
 
+func NewAlbumRepository() *AlbumRepository {
+	return &AlbumRepository{}
+}
+
 func (a *AlbumRepository) GetAlbums() []models.Album {
 	return albums
 }
 
-func (a *AlbumRepository) PostAlbums(newAlbum models.Album) {
+func (a *AlbumRepository) SaveAlbums(newAlbum models.Album) {
 	albums = append(albums, newAlbum)
 }
 

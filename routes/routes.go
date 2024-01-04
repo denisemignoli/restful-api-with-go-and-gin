@@ -6,7 +6,9 @@ import (
 )
 
 func SetupRoutes(router *gin.Engine) {
-	router.GET("/albums", controllers.GetAlbums)
-	router.GET("/albums/:id", controllers.GetAlbumByID)
-	router.POST("/albums", controllers.PostAlbums)
+	albumController := controllers.NewAlbumController()
+
+	router.GET("/albums", albumController.GetAlbums)
+	router.GET("/albums/:id", albumController.GetAlbumByID)
+	router.POST("/albums", albumController.PostAlbums)
 }

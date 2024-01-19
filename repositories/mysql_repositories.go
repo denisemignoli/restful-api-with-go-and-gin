@@ -24,9 +24,9 @@ const (
 
 func NewAlbumMySQLRepository() *AlbumMySQLRepository {
 	// build the DNS
-	dns := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", username, password, host, port, database)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", username, password, host, port, database)
 	// open the connection
-	db, err := sql.Open("mysql", dns)
+	db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		log.Fatalf("impossible to create the connection: %s", err)
 	}
@@ -63,7 +63,23 @@ func executeSQLScript(db *sql.DB, filename string) error {
 }
 
 func (a *AlbumMySQLRepository) GetAlbums() []models.Album {
+	var albums []models.Album
 
+	rows, err := a.db.Query("SELECT * FROM `albums`")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var album models.Album
+		err := rows.Scan(&album.ID, &album.Title, &album.Artist, &album.Price)
+		if err != nil {
+			log.Fatal(err)
+		}
+		albums = append(albums, album)
+	}
 	return albums
 }
 
@@ -81,6 +97,11 @@ func (a *AlbumMySQLRepository) SaveAlbums(newAlbum models.Album) (int64, error) 
 	return id, nil
 }
 
-func (a *AlbumMySQLRepository) GetAlbumByID(id string) (models.Album, error) {
-	return models.Album{}, nil
+func (a *AlbumMySQLRepository) GetAlbumByID(id int64) (models.Album, error) {
+	album := models.Album{}
+	err := a.db.QueryRow("SELECT * FROM `albums` WHERE id = ?", id).Scan(&album.ID, &album.Title, &album.Artist, &album.Price)
+	if err != nil {
+		return models.Album{}, err
+	}
+	return album, nil
 }

@@ -1,27 +1,21 @@
 package controllers
 
 import (
-	"net/http"
-
 	"github.com/denisemignoli/restful-api-with-go-and-gin/models"
 	"github.com/denisemignoli/restful-api-with-go-and-gin/repositories"
+	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
 type AlbumController struct {
-	AlbumRepository *repositories.AlbumRepository
+	AlbumRepository *repositories.AlbumMySQLRepository
 }
-
-// func NewAlbumController() *AlbumController {
-// 	return &AlbumController{
-// 		AlbumRepository: &repositories.AlbumRepository{},
-// 	}
-// }
 
 func NewAlbumController() *AlbumController {
 	return &AlbumController{
-		AlbumRepository: repositories.NewAlbumRepository(),
+		AlbumRepository: repositories.NewAlbumMySQLRepository(),
 	}
 }
 
@@ -35,13 +29,28 @@ func (ac *AlbumController) PostAlbums(c *gin.Context) {
 	if err := c.BindJSON(&newAlbum); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Invalid JSON format"})
 	}
-	ac.AlbumRepository.SaveAlbums(newAlbum)
+
+	id, err := ac.AlbumRepository.SaveAlbums(newAlbum)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "Failed to save album"})
+		return
+	}
+
+	newAlbum.ID = id
+
 	c.IndentedJSON(http.StatusCreated, newAlbum)
 }
 
 func (ac *AlbumController) GetAlbumByID(c *gin.Context) {
-	id := c.Param("id")
+	idStr := c.Param("id")
 
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "invalid id format"})
+		return
+	}
+
+	// Passe o id como int64 para a função GetAlbumByID
 	album, err := ac.AlbumRepository.GetAlbumByID(id)
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "album not found"})

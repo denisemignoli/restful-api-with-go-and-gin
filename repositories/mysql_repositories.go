@@ -66,11 +66,11 @@ func (a *AlbumMySQLRepository) GetAlbums() []models.Album {
 	var albums []models.Album
 
 	rows, err := a.db.Query("SELECT * FROM `albums`")
+	defer rows.Close()
+
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	defer rows.Close()
 
 	for rows.Next() {
 		var album models.Album
@@ -97,11 +97,11 @@ func (a *AlbumMySQLRepository) SaveAlbums(newAlbum models.Album) (int64, error) 
 	return id, nil
 }
 
-func (a *AlbumMySQLRepository) GetAlbumByID(id int64) (models.Album, error) {
+func (a *AlbumMySQLRepository) GetAlbumByID(id int64) (*models.Album, error) {
 	album := models.Album{}
 	err := a.db.QueryRow("SELECT * FROM `albums` WHERE id = ?", id).Scan(&album.ID, &album.Title, &album.Artist, &album.Price)
 	if err != nil {
-		return models.Album{}, err
+		return nil, err
 	}
-	return album, nil
+	return &album, nil
 }

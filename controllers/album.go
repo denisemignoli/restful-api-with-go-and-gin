@@ -29,7 +29,15 @@ func (ac *AlbumController) PostAlbums(c *gin.Context) {
 	if err := c.BindJSON(&newAlbum); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Invalid JSON format"})
 	}
-	ac.AlbumRepository.SaveAlbums(newAlbum)
+
+	id, err := ac.AlbumRepository.SaveAlbums(newAlbum)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "Failed to save album"})
+		return
+	}
+
+	newAlbum.ID = id
+
 	c.IndentedJSON(http.StatusCreated, newAlbum)
 }
 

@@ -10,6 +10,8 @@ import (
 	"os"
 )
 
+// var _ AlbumRepository = &AlbumMySQLRepository{}
+
 type AlbumMySQLRepository struct {
 	db *sql.DB
 }

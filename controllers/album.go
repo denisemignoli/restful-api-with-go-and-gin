@@ -10,12 +10,12 @@ import (
 )
 
 type AlbumController struct {
-	AlbumRepository *repositories.AlbumMySQLRepository
+	AlbumRepository repositories.AlbumRepository
 }
 
-func NewAlbumController() *AlbumController {
+func NewAlbumController(repo repositories.AlbumRepository) *AlbumController {
 	return &AlbumController{
-		AlbumRepository: repositories.NewAlbumMySQLRepository(),
+		AlbumRepository: repo,
 	}
 }
 
